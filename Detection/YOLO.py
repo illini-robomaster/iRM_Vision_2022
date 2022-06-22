@@ -2,7 +2,7 @@ from ctypes import *
 import numpy as np
 import random
 
-from variables import DARKNET_LIB_PATH
+from config import DARKNET_LIB_PATH
 
 # Note: darknet is patched per issue https://github.com/pjreddie/darknet/issues/289
 #============= copied from pjreddie's darknet repo
@@ -29,13 +29,21 @@ class BOX(Structure):
                 ("w", c_float),
                 ("h", c_float)]
 
+# Follow up-to-date definition here
+# https://github.com/AlexeyAB/darknet/blob/ccb392ddf2ab49f66989e6318a2e379c9238068c/darknet.py#L56
 class DETECTION(Structure):
     _fields_ = [("bbox", BOX),
                 ("classes", c_int),
                 ("prob", POINTER(c_float)),
                 ("mask", POINTER(c_float)),
                 ("objectness", c_float),
-                ("sort_class", c_int)]
+                ("sort_class", c_int),
+                ("uc", POINTER(c_float)),
+                ("points", c_int),
+                ("embeddings", POINTER(c_float)),
+                ("embedding_size", c_int),
+                ("sim", c_float),
+                ("track_id", c_int)]
 
 
 class IMAGE(Structure):
@@ -153,7 +161,6 @@ class Yolo:
         '''
         Args:
             image: path to image to predict
-            !TODO: rewrite this to reading an array
         Return:
             An array of tuple (class name, prob, (x, y, w, h))
         '''
